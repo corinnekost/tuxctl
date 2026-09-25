@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+source "$BASE_DIR/lib/common.sh"
+source "$BASE_DIR/lib/logging.sh"
+source "$BASE_DIR/modules/system.sh"
+source "$BASE_DIR/modules/storage.sh"
+source "$BASE_DIR/modules/health.sh"
+source "$BASE_DIR/modules/network.sh"
+
+show_help() {
+	echo "Usage: tuxctl <command>"
+	echo
+	echo "Commands:"
+	echo "	help		Show this help message"
+	echo "	version		Show tuxctl version"
+	echo "	system		Show basic system information"
+	echo "	storage		Show storage information"
+	echo "	health		Show basic system health"
+}
+
+show_version() {
+	cat "$BASE_DIR/VERSION"
+}
+
+case "$1" in
+	help|"")
+		show_help
+		;;
+
+	version)
+		show_version
+		;;
+
+	system)
+		system_info
+		;;
+
+	storage)
+		storage_info
+		;;
+
+	health)
+		health_check
+		;;
+
+	network)
+		require_root || exit 1
+		iptables_list
+		;;
+
+	*)
+		log ERROR "Unknown command: $1"
+		echo
+		show_help
+		exit 1
+		;;
+esac
